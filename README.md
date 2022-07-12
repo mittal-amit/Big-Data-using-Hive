@@ -106,4 +106,4 @@ Data has been inserted and we'll be able to do the analysis or data can be given
 get 'ord_hive', 9996
 ```
 
-[This is the final output!](https://github.com/mittal-amit/Big-Data-using-Hive/blob/main/Hive-Hbase%20Table%20Output.png)
+![This is the final output!](https://github.com/mittal-amit/Big-Data-using-Hive/blob/main/Hive-Hbase%20Table%20Output.png)
