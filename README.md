@@ -24,19 +24,24 @@ So we're going to follow the below mentioned steps to sort out this problem
 **Step 2**: We're going to transfer the data to HDFS i.e. from Oracle database to distributed systems and for this we've used Sqoop
 
 **#Table 1 - Import data to Hive**
+```
 sqoop import \
 --connect jdbc:mysql://quickstart.cloudera:3306/retail_db \
 --username root \
 --password cloudera \
 --table orders \
 --warehouse-dir /user/amitm/project\
-   
-**#Table 2 - sqoop import \**
+```
+
+**#Table 2 - Import data to Hive**
+```
+sqoop import \
 --connect jdbc:mysql://quickstart.cloudera:3306/retail_db \
 --username root \
 --password cloudera \
 --table customers \
 --warehouse-dir /user/amitm/project
+```
 
 **Step 3**: Now, as data is transferred on HDFS, we need to create the scheme on Hive Warehouse. We can customize the schema or create exact same as table present in Oracle Database. I've create as same as present in transactional database.
 
@@ -45,6 +50,7 @@ We can create the table either
 - Or, create the same schema using Sqoop on Hive, in this case we don't need to mention the column names
 
 **#Create Hive table - 1**
+```
 sqoop create-hive-table \
 --connect jdbc:mysql://quickstart.cloudera:3306/retail_db \
 --username root \
@@ -52,8 +58,10 @@ sqoop create-hive-table \
 --table orders \
 --hive-table ord_minip \
 --fields-terminated-by ','
+```
 
 **#Create Hive table - 2**
+```
 sqoop create-hive-table \
 --connect jdbc:mysql://quickstart.cloudera:3306/retail_db \
 --username root \
@@ -61,10 +69,13 @@ sqoop create-hive-table \
 --table customers \
 --hive-table cust_minip \
 --fields-terminated-by ','
+```
 
 **Step 4**: Now, we need to load the data into these tables
+```
 load data inpath '/user/amitm/project/orders' into table ord_minip;
 load data inpath '/user/amitm/project/customers' into table cust_minip;
+```
 
 **Step 5**: Table has been created in Hive and we can access the tables, do the analysis but there is one more problem which is:
 
@@ -79,12 +90,20 @@ This table can be accessed from Hive as well as HBase. Hive helps in processing 
 Note: HBase isn't relational database and it doesn't follow ACID properties.
  
 **#Create Hbase**-Hive Table: We have combined both the tables
+```
 CREATE TABLE ord_hive(customer_id int,customer_fname string,customer_lname string,order_id int, order_date string) STORED BY 'org.apache.hadoop.hive.hbase.HBaseStorageHandler' with SERDEPROPERTIES ('hbase.columns.mapping'=':key, personal:customer_fname, personal:customer_lname, personal:order_id,personal:order_date');
+```
 
 **Step 6**: Load the data into Hive-HBase Table
-
+```
 insert overwrite table ord_hive select c.customer_id, c.customer_fname, c.customer_lname, o.order_id, o.order_date from cust_minip c join ord_minip o on c.customer_id = o.order_customer_id;
+```
 
 Data has been inserted and we'll be able to do the analysis or data can be given to Data Analyst/Data Scientist who can perform the stastical analysis on the data.
 
-**Step 7**: get 'ord_hive', 9996
+**Step 7**: Retrieve the data
+```
+get 'ord_hive', 9996
+```
+
+[This is the final output!](https://github.com/mittal-amit/Big-Data-using-Hive/blob/main/Hive-Hbase%20Table%20Output.png)
